@@ -7,7 +7,7 @@ import Register from "./routes/auth/Register";
 import Home from "./routes/Home";
 import Protected from "./routes/Protected";
 import { AuthProvider } from "./contexts/AuthContext";
-
+import "./global.css";
 const router = createBrowserRouter([
   {
     path: "/",
