@@ -1,17 +1,8 @@
-import { Button, Container } from "@mui/material";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { Container } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
-function Root() {
-  async function logout() {
-    try {
-      await signOut(auth);
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
+function Root() {
   return (
     <>
       <Navbar />
