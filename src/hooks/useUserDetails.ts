@@ -1,15 +1,8 @@
-import {
-  addDoc,
-  collection,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { useState } from "react";
 import useAuth from "./useAuth";
-import { Unsubscribe, User } from "firebase/auth";
+import { User } from "firebase/auth";
 import { UserDetails } from "../models/UserDetails";
 
 function useUserDetails() {
@@ -18,7 +11,7 @@ function useUserDetails() {
 
   const [details, setDetails] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  // const [error, setError] = useState<Error | null>(null);
 
   async function addUserDetails(username: string) {
     setLoading(true);
@@ -92,7 +85,7 @@ function useUserDetails() {
   return {
     details,
     loading,
-    error,
+    // error,
     addUserDetails,
     getUserDetails,
   };

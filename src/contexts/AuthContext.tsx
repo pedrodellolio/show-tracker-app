@@ -2,7 +2,6 @@ import { User, onAuthStateChanged } from "firebase/auth";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth } from "../firebaseConfig";
 import useUserDetails from "../hooks/useUserDetails.ts";
-import UpdateUserDetailsModal from "../components/UpdateUserDetailsModal";
 
 interface AuthContextData {
   user: User | null;
@@ -15,7 +14,7 @@ interface Props {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: Props) => {
-  const { details, getUserDetails } = useUserDetails();
+  const { getUserDetails } = useUserDetails();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasUserDetails, setHasUserDetails] = useState(true);

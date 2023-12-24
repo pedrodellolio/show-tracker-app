@@ -20,7 +20,7 @@ function useUserShow() {
 
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  // const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     getUserShows();
@@ -92,7 +92,7 @@ function useUserShow() {
   return {
     shows,
     loading,
-    error,
+    // error,
     addUserShow,
     getUserShows,
     deleteUserShow,
