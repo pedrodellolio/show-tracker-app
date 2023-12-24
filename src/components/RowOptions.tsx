@@ -3,12 +3,17 @@ import Menu from "@mui/material/Menu";
 import { Box, IconButton, MenuItem } from "@mui/material";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import useUserShow from "../hooks/useUserShow";
+import useAuth from "../hooks/useAuth";
 
 interface Props {
+  userUID: string | null;
   rowId: string;
 }
+
 function RowOptions(props: Props) {
-  const { deleteUserShow } = useUserShow();
+  const { user } = useAuth();
+  const uid = props.userUID ?? user!.uid;
+  const { deleteUserShow } = useUserShow(uid);
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);

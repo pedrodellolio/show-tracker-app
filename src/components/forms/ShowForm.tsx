@@ -16,8 +16,10 @@ import {
   createShowFormSchema,
 } from "../../schemas/showFormSchema";
 import { Status, Type } from "../../models/Show";
+import useAuth from "../../hooks/useAuth";
 
 interface Props {
+  userUID: string | null;
   setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -30,10 +32,12 @@ function ShowForm(props: Props) {
     resolver: zodResolver(createShowFormSchema),
   });
 
-  const { addUserShow, loading } = useUserShow();
+  const { user } = useAuth();
+  const uid = props.userUID ?? user!.uid;
+  const { addUserShow, loading } = useUserShow(uid);
 
   async function createShow(data: CreateShowFormData) {
-    addUserShow(data);
+    addUserShow(data, uid);
     props.setOpenDrawer(false);
   }
 

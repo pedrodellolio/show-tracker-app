@@ -7,6 +7,13 @@ import Home from "./routes/Home";
 import Protected from "./routes/Protected";
 import "./global.css";
 import App from "./App";
+import User from "./routes/User";
+import { getUserDetailsByUserName } from "./services/userDetailsApi";
+
+const userLoader = async ({ params }: any) => {
+  const details = await getUserDetailsByUserName(params.userName);
+  return { details };
+};
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +26,11 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Home />,
+          },
+          {
+            path: "user/:userName",
+            loader: userLoader,
+            element: <User />,
           },
         ],
       },

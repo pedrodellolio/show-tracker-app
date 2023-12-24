@@ -14,7 +14,7 @@ interface Props {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: Props) => {
-  const { getUserDetails } = useUserDetails();
+  const { getUserDetails, addUserDetails } = useUserDetails();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasUserDetails, setHasUserDetails] = useState(true);
@@ -22,8 +22,11 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        getUserDetails(currentUser).then((hasDetails) => {
-          if (!hasDetails) setHasUserDetails(false);
+        getUserDetails(currentUser).then((details) => {
+          if (!details) {
+            addUserDetails(currentUser, "", currentUser.photoURL);
+            setHasUserDetails(false);
+          }
         });
         setUser(currentUser);
       } else {

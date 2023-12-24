@@ -15,53 +15,65 @@ import { auth } from "../firebaseConfig";
 import useAuth from "../hooks/useAuth";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import SearchIcon from "@mui/icons-material/Search";
+
 import useColorMode from "../hooks/useColorMode";
-import { useTheme } from "@mui/material";
+import {
+  Autocomplete,
+  InputBase,
+  TextField,
+  alpha,
+  styled,
+  useTheme,
+} from "@mui/material";
+import useAllUsersDetails from "../hooks/useAllUsersDetails";
 
-// const Search = styled("div")(({ theme }) => ({
-//   position: "relative",
-//   borderRadius: theme.shape.borderRadius,
-//   backgroundColor: alpha(theme.palette.common.white, 0.15),
-//   "&:hover": {
-//     backgroundColor: alpha(theme.palette.common.white, 0.25),
-//   },
-//   marginRight: theme.spacing(2),
-//   marginLeft: 0,
-//   width: "100%",
-//   [theme.breakpoints.up("sm")]: {
-//     marginLeft: theme.spacing(3),
-//     width: "auto",
-//   },
-// }));
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(3),
+    width: "auto",
+  },
+}));
 
-// const SearchIconWrapper = styled("div")(({ theme }) => ({
-//   padding: theme.spacing(0, 2),
-//   height: "100%",
-//   position: "absolute",
-//   pointerEvents: "none",
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "center",
-// }));
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
 
-// const StyledInputBase = styled(InputBase)(({ theme }) => ({
-//   color: "inherit",
-//   "& .MuiInputBase-input": {
-//     padding: theme.spacing(1, 1, 1, 0),
-//     // vertical padding + font size from searchIcon
-//     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-//     transition: theme.transitions.create("width"),
-//     width: "100%",
-//     [theme.breakpoints.up("md")]: {
-//       width: "20ch",
-//     },
-//   },
-// }));
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 4, 1, 1),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    fontSize: "small",
+    [theme.breakpoints.up("md")]: {
+      width: "20ch",
+    },
+  },
+}));
 
 export default function Navbar() {
   const { user } = useAuth();
   const theme = useTheme();
   const { toggleColorMode, themeMode } = useColorMode();
+  const { users, getAllUsersDetailsByInput } = useAllUsersDetails();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
@@ -72,6 +84,10 @@ export default function Navbar() {
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleSearch = async (value: string) => {
+    if (value) await getAllUsersDetailsByInput(value);
   };
 
   const handleMobileMenuClose = () => {
@@ -161,15 +177,58 @@ export default function Navbar() {
           >
             Shower
           </Typography>
-          {/* <Search>
+          <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
+            <Autocomplete
+              sx={{ width: 300 }}
+              options={users}
+              autoHighlight
+              freeSolo
+              disableClearable
+              getOptionLabel={(option) =>
+                typeof option === "string"
+                  ? option
+                  : option.userName.toLocaleLowerCase()
+              }
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...props}
+                >
+                  {option.photoURL && (
+                    <img
+                      loading="lazy"
+                      width="20"
+                      srcSet={option.photoURL + ` 2x`}
+                      src={option.photoURL}
+                      alt=""
+                    />
+                  )}
+                  {option.userName.toLocaleLowerCase()}
+                </Box>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  placeholder="Search for user…"
+                  onChange={(e) => handleSearch(e.target.value)}
+                  inputProps={{
+                    ...params.inputProps,
+                    style: {
+                      fontSize: "small",
+                      border: "none",
+                      paddingLeft: 40,
+                    },
+                    autoComplete: "search", // disable autocomplete and autofill
+                  }}
+                />
+              )}
             />
-          </Search> */}
+          </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton

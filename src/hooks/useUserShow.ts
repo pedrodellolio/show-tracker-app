@@ -10,27 +10,25 @@ import {
 import { db } from "../firebaseConfig";
 import { useEffect, useState } from "react";
 import { CreateShowFormData } from "../schemas/showFormSchema";
-import useAuth from "./useAuth";
 import { Show } from "../models/Show";
 import { Unsubscribe } from "firebase/auth";
 
-function useUserShow() {
+function useUserShow(userUID: string) {
   const showCollectionRef = collection(db, "userShow");
-  const { user } = useAuth();
 
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(false);
   // const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    getUserShows();
+    getUserShowsByUID(userUID);
   }, []);
 
-  async function addUserShow(data: CreateShowFormData) {
+  async function addUserShow(data: CreateShowFormData, uid: string) {
     setLoading(true);
     try {
       await addDoc(showCollectionRef, {
-        userUID: user?.uid,
+        userUID: uid,
         name: data.name,
         currentEpisode: data.currentEpisode,
         currentSeason: data.currentSeason,
@@ -62,13 +60,13 @@ function useUserShow() {
     }
   }
 
-  function getUserShows() {
+  function getUserShowsByUID(uid: string) {
     let unsubscribe: Unsubscribe;
     setLoading(true);
     try {
       const queryTransaction = query(
         showCollectionRef,
-        where("userUID", "==", user?.uid)
+        where("userUID", "==", uid)
       );
       unsubscribe = onSnapshot(queryTransaction, (snapshot) => {
         let docs: Show[] = [];
@@ -94,7 +92,7 @@ function useUserShow() {
     loading,
     // error,
     addUserShow,
-    getUserShows,
+    getUserShowsByUID,
     deleteUserShow,
   };
 }

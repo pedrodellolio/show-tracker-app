@@ -7,7 +7,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import UserDetailsForm from "../components/forms/UserDetailsForm";
+import UserDetailsForm from "./forms/UserDetailsForm";
 
 function UpdateUserDetailsModal() {
   const theme = useTheme();

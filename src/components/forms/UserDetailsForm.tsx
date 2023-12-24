@@ -12,6 +12,7 @@ import {
   CreateUserDetailsFormData,
   createUserDetailsFormSchema,
 } from "../../schemas/userDetailsFormSchema";
+import useAuth from "../../hooks/useAuth";
 
 interface Props {
   handleCloseModal: () => void;
@@ -26,11 +27,11 @@ function UserDetailsForm(props: Props) {
     resolver: zodResolver(createUserDetailsFormSchema),
   });
 
-  const { addUserDetails } = useUserDetails();
-
-  async function createUserDetails(data: CreateUserDetailsFormData) {
+  const { updateUserDetails } = useUserDetails();
+  const { user } = useAuth();
+  async function updateDetails(data: CreateUserDetailsFormData) {
     try {
-      await addUserDetails(data.userName);
+      await updateUserDetails(user!.uid, data.userName);
       props.handleCloseModal();
     } catch (err) {
       console.error(err);
@@ -40,7 +41,7 @@ function UserDetailsForm(props: Props) {
   return (
     <form
       noValidate
-      onSubmit={handleSubmit(createUserDetails)}
+      onSubmit={handleSubmit(updateDetails)}
       action="POST"
       style={{
         display: "flex",

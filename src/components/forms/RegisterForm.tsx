@@ -45,7 +45,11 @@ function RegisterForm() {
         data.password
       );
       await updateProfile(userCredentials.user, { displayName: data.userName });
-      await addUserDetails(data.userName);
+      await addUserDetails(
+        userCredentials.user,
+        "",
+        userCredentials.user.photoURL
+      );
     } catch (err) {
       console.error(err);
     }
