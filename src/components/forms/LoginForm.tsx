@@ -6,6 +6,8 @@ import {
   IconButton,
   Button,
   Container,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -16,6 +18,7 @@ import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 function LoginForm() {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +52,7 @@ function LoginForm() {
   }
 
   return (
-    <Container>
+    <>
       <form
         onSubmit={(e) => handleSubmit(e)}
         action="post"
@@ -106,6 +109,9 @@ function LoginForm() {
           Login
         </Button>
       </form>
+      <Typography mb={1} textAlign={"center"} variant="body2">
+        or
+      </Typography>
       <Button
         onClick={loginWithGoogle}
         variant="outlined"
@@ -114,8 +120,13 @@ function LoginForm() {
         Sign in with Google
       </Button>
 
-      <Link to="/register">Register</Link>
-    </Container>
+      <Typography textAlign={"center"} mt={1} variant="body2">
+        Don't have an account?{" "}
+        <Link to="/register" style={{ color: theme.palette.primary.main }}>
+          Register here
+        </Link>
+      </Typography>
+    </>
   );
 }
 

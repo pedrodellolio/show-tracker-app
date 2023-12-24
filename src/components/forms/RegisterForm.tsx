@@ -8,19 +8,22 @@ import {
   Container,
   FormHelperText,
   Box,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import {
   CreateUserFormData,
   createUserFormSchema,
 } from "../../schemas/userFormSchema";
 import { Link } from "react-router-dom";
+import useUserDetails from "../../hooks/useUserDetails";
 
 function RegisterForm() {
   const {
@@ -31,11 +34,19 @@ function RegisterForm() {
     resolver: zodResolver(createUserFormSchema),
   });
 
+  const theme = useTheme();
+  const { addUserDetails } = useUserDetails();
   const [showPassword, setShowPassword] = useState(false);
 
   async function createUser(data: CreateUserFormData) {
     try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      await updateProfile(userCredentials.user, { displayName: data.userName });
+      await addUserDetails(data.userName);
     } catch (err) {
       console.error(err);
     }
@@ -50,7 +61,7 @@ function RegisterForm() {
   }
 
   return (
-    <Container>
+    <>
       <form
         noValidate
         onSubmit={handleSubmit(createUser)}
@@ -149,9 +160,14 @@ function RegisterForm() {
         <Button type="submit" variant="contained" sx={{ width: "100%", mb: 1 }}>
           Register
         </Button>
-        <Link to="/login">Login</Link>
       </form>
-    </Container>
+      <Typography textAlign={"center"} mt={1} variant="body2">
+        Already have an account?{" "}
+        <Link to="/login" style={{ color: theme.palette.primary.main }}>
+          Login here
+        </Link>
+      </Typography>
+    </>
   );
 }
 

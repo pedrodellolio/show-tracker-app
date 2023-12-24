@@ -66,6 +66,7 @@ export const getDesignTokens = (mode: PaletteMode) => ({
       styleOverrides: {
         root: {
           backgroundImage: "none",
+          boxShadow: "none",
         },
       },
     },
