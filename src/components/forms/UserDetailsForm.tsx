@@ -7,12 +7,13 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useUserDetails from "../../hooks/useUserDetails";
 import {
   CreateUserDetailsFormData,
   createUserDetailsFormSchema,
 } from "../../schemas/userDetailsFormSchema";
 import useAuth from "../../hooks/useAuth";
+import { useMutation } from "@tanstack/react-query";
+import { updateUserDetails } from "../../services/userDetailsApi";
 
 interface Props {
   handleCloseModal: () => void;
@@ -27,15 +28,20 @@ function UserDetailsForm(props: Props) {
     resolver: zodResolver(createUserDetailsFormSchema),
   });
 
-  const { updateUserDetails } = useUserDetails();
   const { user } = useAuth();
-  async function updateDetails(data: CreateUserDetailsFormData) {
-    try {
-      await updateUserDetails(user!.uid, data.userName);
+
+  const { mutateAsync } = useMutation({
+    mutationFn: updateUserDetails,
+    onSuccess: () => {
       props.handleCloseModal();
-    } catch (err) {
-      console.error(err);
-    }
+    },
+    onError: () => {
+      alert("there was an error");
+    },
+  });
+
+  async function updateDetails(data: CreateUserDetailsFormData) {
+    mutateAsync({ userUID: user!.uid, userName: data.userName, photoURL: "" });
   }
 
   return (

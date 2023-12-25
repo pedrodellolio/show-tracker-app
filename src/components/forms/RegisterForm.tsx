@@ -21,10 +21,14 @@ import {
   CreateUserFormData,
   createUserFormSchema,
 } from "../../schemas/userFormSchema";
-import { Link } from "react-router-dom";
-import useUserDetails from "../../hooks/useUserDetails";
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { addUserDetails } from "../../services/userDetailsApi";
 
 function RegisterForm() {
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -33,9 +37,17 @@ function RegisterForm() {
     resolver: zodResolver(createUserFormSchema),
   });
 
-  const theme = useTheme();
-  const { addUserDetails } = useUserDetails();
   const [showPassword, setShowPassword] = useState(false);
+
+  const { mutateAsync } = useMutation({
+    mutationFn: addUserDetails,
+    onSuccess: () => {
+      navigate("/", { replace: true });
+    },
+    onError: () => {
+      alert("there was an error");
+    },
+  });
 
   async function createUser(data: CreateUserFormData) {
     try {
@@ -45,11 +57,11 @@ function RegisterForm() {
         data.password
       );
       await updateProfile(userCredentials.user, { displayName: data.userName });
-      await addUserDetails(
-        userCredentials.user,
-        "",
-        userCredentials.user.photoURL
-      );
+      await mutateAsync({
+        userUID: userCredentials.user.uid,
+        photoURL: userCredentials.user.photoURL,
+        userName: "",
+      });
     } catch (err) {
       console.error(err);
     }

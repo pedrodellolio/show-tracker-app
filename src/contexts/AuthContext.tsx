@@ -1,7 +1,11 @@
 import { User, onAuthStateChanged } from "firebase/auth";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth } from "../firebaseConfig";
-import useUserDetails from "../hooks/useUserDetails.ts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  addUserDetails,
+  getUserDetailsByUID,
+} from "../services/userDetailsApi.ts";
 
 interface AuthContextData {
   user: User | null;
@@ -14,20 +18,40 @@ interface Props {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: Props) => {
-  const { getUserDetails, addUserDetails } = useUserDetails();
+  const queryClient = useQueryClient();
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasUserDetails, setHasUserDetails] = useState(true);
 
+  const { mutateAsync } = useMutation({
+    mutationFn: addUserDetails,
+    onSuccess: () => {
+      setHasUserDetails(false);
+    },
+    onError: () => {
+      alert("there was an error");
+    },
+  });
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        getUserDetails(currentUser).then((details) => {
-          if (!details) {
-            addUserDetails(currentUser, "", currentUser.photoURL);
-            setHasUserDetails(false);
-          }
-        });
+        queryClient
+          .fetchQuery({
+            queryKey: ["userDetails", currentUser.uid],
+            queryFn: () => getUserDetailsByUID(currentUser.uid),
+          })
+          .then((data) => {
+            if (!data) {
+              mutateAsync({
+                userUID: currentUser.uid,
+                photoURL: currentUser.photoURL,
+                userName: "",
+              });
+            }
+          });
+
         setUser(currentUser);
       } else {
         setUser(null);
