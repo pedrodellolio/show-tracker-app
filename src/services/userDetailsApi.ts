@@ -53,6 +53,23 @@ export async function updateUserDetails({
   });
 }
 
+export async function getAllUsersDetailsByInput(value: string) {
+  if (value === "") return null;
+  const queryTransaction = query(
+    userDetailsCollectionRef,
+    where("userName", ">=", value.toLocaleUpperCase()),
+    where("userName", "<=", value.toLocaleUpperCase() + "\uf8ff")
+  );
+  const querySnapshot = await getDocs(queryTransaction);
+  let docs: UserDetails[] = [];
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const id = doc.id;
+    docs.push({ userName: data.userName, userUID: id } as UserDetails);
+  });
+  return docs;
+}
+
 export async function getUserDetailsByUID(userUID: string) {
   const querySnapshot = await getUserDetailsSnapshot("userUID", "==", userUID);
   let docs: UserDetails[] = [];

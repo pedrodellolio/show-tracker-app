@@ -1,11 +1,9 @@
 import * as React from "react";
-// import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-// import InputBase from "@mui/material/InputBase";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -20,13 +18,15 @@ import SearchIcon from "@mui/icons-material/Search";
 import useColorMode from "../hooks/useColorMode";
 import {
   Autocomplete,
-  InputBase,
   TextField,
   alpha,
   styled,
   useTheme,
 } from "@mui/material";
-import useAllUsersDetails from "../hooks/useAllUsersDetails";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUsersDetailsByInput } from "../services/userDetailsApi";
+import { Link, useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -54,30 +54,21 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   justifyContent: "center",
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 4, 1, 1),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    fontSize: "small",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
-
 export default function Navbar() {
   const { user } = useAuth();
   const theme = useTheme();
+  const navigate = useNavigate();
   const { toggleColorMode, themeMode } = useColorMode();
-  const { users, getAllUsersDetailsByInput } = useAllUsersDetails();
 
+  const [searchedValue, setSearchedValue] = useState("");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
+
+  const { data: users } = useQuery({
+    queryKey: ["getUsersDetails", searchedValue],
+    queryFn: () => getAllUsersDetailsByInput(searchedValue),
+  });
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -87,7 +78,7 @@ export default function Navbar() {
   };
 
   const handleSearch = async (value: string) => {
-    if (value) await getAllUsersDetailsByInput(value);
+    setSearchedValue(value);
   };
 
   const handleMobileMenuClose = () => {
@@ -183,10 +174,14 @@ export default function Navbar() {
             </SearchIconWrapper>
             <Autocomplete
               sx={{ width: 300 }}
-              options={users}
+              options={users || []}
               autoHighlight
               freeSolo
               disableClearable
+              onChange={(_, value) => {
+                if (typeof value == "object" && "userName" in value)
+                  navigate(`/user/${value.userName.toLocaleLowerCase()}`);
+              }}
               getOptionLabel={(option) =>
                 typeof option === "string"
                   ? option
@@ -207,7 +202,9 @@ export default function Navbar() {
                       alt=""
                     />
                   )}
-                  {option.userName.toLocaleLowerCase()}
+                  <Link to={`/user/${option.userName.toLocaleLowerCase()}`}>
+                    {option.userName.toLocaleLowerCase()}
+                  </Link>
                 </Box>
               )}
               renderInput={(params) => (
@@ -223,7 +220,7 @@ export default function Navbar() {
                       border: "none",
                       paddingLeft: 40,
                     },
-                    autoComplete: "search", // disable autocomplete and autofill
+                    type: "search", // disable autocomplete and autofill
                   }}
                 />
               )}

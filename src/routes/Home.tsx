@@ -26,9 +26,9 @@ function Home() {
           Add Show
         </Button>
       </Box>
-      <MoviesDataGrid />
+      <MoviesDataGrid userUID={null} />
       <Drawer anchor={"right"} open={openDrawer} onClose={toggleDrawer(false)}>
-        <ShowForm setOpenDrawer={setOpenDrawer} />
+        <ShowForm setOpenDrawer={setOpenDrawer} userUID={null} />
       </Drawer>
     </>
   );
