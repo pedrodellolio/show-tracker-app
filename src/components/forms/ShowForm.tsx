@@ -10,13 +10,14 @@ import {
   Box,
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import useUserShow from "../../hooks/useUserShow";
 import {
   CreateShowFormData,
   createShowFormSchema,
 } from "../../schemas/showFormSchema";
 import { Status, Type } from "../../models/Show";
 import useAuth from "../../hooks/useAuth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addUserShow } from "../../services/userShowsApi";
 
 interface Props {
   userUID: string | null;
@@ -34,10 +35,22 @@ function ShowForm(props: Props) {
 
   const { user } = useAuth();
   const uid = props.userUID ?? user!.uid;
-  const { addUserShow, loading } = useUserShow(uid);
+
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: addUserShow,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getUserShows"],
+      });
+    },
+    onError: () => {
+      alert("there was an error");
+    },
+  });
 
   async function createShow(data: CreateShowFormData) {
-    addUserShow(data, uid);
+    await mutateAsync({ data, uid });
     props.setOpenDrawer(false);
   }
 
@@ -216,7 +229,7 @@ function ShowForm(props: Props) {
         </Box>
 
         <LoadingButton
-          loading={loading}
+          loading={isPending}
           type="submit"
           variant="contained"
           sx={{ width: "100%", mb: 1 }}

@@ -2,9 +2,18 @@ import { Box, Button, Drawer } from "@mui/material";
 import MoviesDataGrid from "../components/MoviesDataGrid";
 import ShowForm from "../components/forms/ShowForm";
 import { useState } from "react";
+import useAuth from "../hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { getUserShowsByUID } from "../services/userShowsApi";
 
 function Home() {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const { user } = useAuth();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["getUserShows", user!.uid],
+    queryFn: () => getUserShowsByUID(user!.uid),
+  });
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -26,7 +35,11 @@ function Home() {
           Add Show
         </Button>
       </Box>
-      <MoviesDataGrid userUID={null} />
+      <MoviesDataGrid
+        data={data ?? []}
+        loading={isLoading}
+        userUID={user!.uid}
+      />
       <Drawer anchor={"right"} open={openDrawer} onClose={toggleDrawer(false)}>
         <ShowForm setOpenDrawer={setOpenDrawer} userUID={null} />
       </Drawer>

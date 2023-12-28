@@ -65,7 +65,7 @@ export default function Navbar() {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
-  const { data: users } = useQuery({
+  const { data: users, isLoading } = useQuery({
     queryKey: ["getUsersDetails", searchedValue],
     queryFn: () => getAllUsersDetailsByInput(searchedValue),
   });
@@ -193,18 +193,13 @@ export default function Navbar() {
                   sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
                   {...props}
                 >
-                  {option.photoURL && (
-                    <img
-                      loading="lazy"
-                      width="20"
-                      srcSet={option.photoURL + ` 2x`}
-                      src={option.photoURL}
-                      alt=""
-                    />
+                  {isLoading ? (
+                    <Typography variant="body2">Searching users...</Typography>
+                  ) : (
+                    <Link to={`/user/${option.userName.toLocaleLowerCase()}`}>
+                      {option.userName.toLocaleLowerCase()}
+                    </Link>
                   )}
-                  <Link to={`/user/${option.userName.toLocaleLowerCase()}`}>
-                    {option.userName.toLocaleLowerCase()}
-                  </Link>
                 </Box>
               )}
               renderInput={(params) => (

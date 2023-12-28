@@ -2,18 +2,27 @@ import React from "react";
 import Menu from "@mui/material/Menu";
 import { Box, IconButton, MenuItem } from "@mui/material";
 import MoreIcon from "@mui/icons-material/MoreVert";
-import useUserShow from "../hooks/useUserShow";
-import useAuth from "../hooks/useAuth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteUserShow } from "../services/userShowsApi";
 
 interface Props {
-  userUID: string | null;
+  userUID: string;
   rowId: string;
 }
 
 function RowOptions(props: Props) {
-  const { user } = useAuth();
-  const uid = props.userUID ?? user!.uid;
-  const { deleteUserShow } = useUserShow(uid);
+  const queryClient = useQueryClient();
+  const { mutateAsync } = useMutation({
+    mutationFn: deleteUserShow,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getUserShows", props.userUID],
+      });
+    },
+    onError: () => {
+      alert("there was an error");
+    },
+  });
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -29,7 +38,7 @@ function RowOptions(props: Props) {
   }
 
   async function handleRemoveShow() {
-    await deleteUserShow(props.rowId);
+    await mutateAsync(props.rowId);
     handleMobileMenuClose();
   }
 

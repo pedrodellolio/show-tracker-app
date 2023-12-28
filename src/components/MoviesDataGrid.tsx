@@ -1,20 +1,18 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Chip, Typography } from "@mui/material";
 import getShowStatusColor from "../utils/showStatusColor";
-import useUserShow from "../hooks/useUserShow";
 import formatShowsGrid from "../utils/formatShowsGrid";
 import RowOptions from "../components/RowOptions";
 import useColorMode from "../hooks/useColorMode";
-import useAuth from "../hooks/useAuth";
+import { Show } from "../models/Show";
 
 interface Props {
-  userUID: string | null;
+  userUID: string;
+  data: Show[];
+  loading: boolean;
 }
 
 function MoviesDataGrid(props: Props) {
-  const { user } = useAuth();
-  const uid = props.userUID ?? user!.uid;
-  const { shows, loading } = useUserShow(uid);
   const { themeMode } = useColorMode();
 
   const columns: GridColDef[] = [
@@ -22,19 +20,19 @@ function MoviesDataGrid(props: Props) {
       field: "col1",
       headerName: "Name",
       disableColumnMenu: true,
-      // width: 300
+      width: 250
     },
     {
       field: "col2",
       headerName: "Current Episode",
       disableColumnMenu: true,
-      // width: 150,
+      width: 150,
     },
     {
       field: "col3",
       headerName: "Current Season",
       disableColumnMenu: true,
-      // width: 150,
+      width: 150,
     },
     {
       field: "col4",
@@ -86,16 +84,16 @@ function MoviesDataGrid(props: Props) {
       disableColumnMenu: true,
       // width: 150,
       renderCell: (params) => {
-        return <RowOptions userUID={uid} rowId={params.row.id} />;
+        return <RowOptions userUID={props.userUID} rowId={params.row.id} />;
       },
     },
   ];
 
   return (
     <div>
-      {!loading ? (
+      {!props.loading ? (
         <DataGrid
-          rows={formatShowsGrid(shows)}
+          rows={props.data ? formatShowsGrid(props.data) : []}
           columns={columns}
           autoHeight
           slots={{
@@ -105,7 +103,7 @@ function MoviesDataGrid(props: Props) {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  mt: 2
+                  mt: 2,
                 }}
               >
                 <Typography variant="body1" textAlign={"center"}>
