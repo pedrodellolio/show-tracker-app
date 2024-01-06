@@ -1,4 +1,4 @@
-import { Box, Button, Drawer } from "@mui/material";
+import { Box, Button, Container, Drawer, Typography } from "@mui/material";
 import MoviesDataGrid from "../components/MoviesDataGrid";
 import ShowForm from "../components/forms/ShowForm";
 import { useState } from "react";
@@ -36,12 +36,18 @@ function Home() {
         </Button>
       </Box>
       <MoviesDataGrid
+        removable={true}
         data={data ?? []}
         loading={isLoading}
         userUID={user!.uid}
       />
       <Drawer anchor={"right"} open={openDrawer} onClose={toggleDrawer(false)}>
-        <ShowForm setOpenDrawer={setOpenDrawer} userUID={null} />
+        <Container sx={{ mt: 4 }}>
+          <Typography variant="h6" mb={2}>
+            New show
+          </Typography>
+          <ShowForm setOpenDrawer={setOpenDrawer} userUID={null} />
+        </Container>
       </Drawer>
     </>
   );

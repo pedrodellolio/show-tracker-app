@@ -46,8 +46,9 @@ export const AuthProvider = ({ children }: Props) => {
             if (!data) {
               mutateAsync({
                 userUID: currentUser.uid,
-                photoURL: currentUser.photoURL,
                 userName: "",
+                displayName: currentUser.displayName,
+                photoURL: currentUser.photoURL,
               });
             }
           });

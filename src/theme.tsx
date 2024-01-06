@@ -19,6 +19,11 @@ export const getDesignTokens = (mode: PaletteMode) => ({
           },
           background: {
             default: "#fff",
+            paper: "#eee",
+          },
+          text: {
+            primary: "#000",
+            secondary: "#626262",
           },
         }
       : {
@@ -28,6 +33,11 @@ export const getDesignTokens = (mode: PaletteMode) => ({
           },
           background: {
             default: "#121212",
+            paper: "#0d0d0d",
+          },
+          text: {
+            // primary: "#000",
+            secondary: "#8a8a8a",
           },
         }),
   } as PaletteOptions,
@@ -44,6 +54,9 @@ export const getDesignTokens = (mode: PaletteMode) => ({
       },
     },
     MuiButton: {
+      defaultProps: {
+        disableRipple: true,
+      },
       styleOverrides: {
         root: {
           fontWeight: 500,
@@ -67,6 +80,13 @@ export const getDesignTokens = (mode: PaletteMode) => ({
         root: {
           backgroundImage: "none",
           boxShadow: "none",
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        root: {
+          borderColor: "#000",
         },
       },
     },

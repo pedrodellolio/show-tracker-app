@@ -13,46 +13,12 @@ import { auth } from "../firebaseConfig";
 import useAuth from "../hooks/useAuth";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import SearchIcon from "@mui/icons-material/Search";
-
 import useColorMode from "../hooks/useColorMode";
-import {
-  Autocomplete,
-  TextField,
-  alpha,
-  styled,
-  useTheme,
-} from "@mui/material";
+import { Autocomplete, TextField, useTheme } from "@mui/material";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsersDetailsByInput } from "../services/userDetailsApi";
 import { Link, useNavigate } from "react-router-dom";
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -149,16 +115,7 @@ export default function Navbar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" elevation={0}>
-        <Toolbar>
-          {/* <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton> */}
+        <Toolbar sx={{ display: "flex", flexDirection: "row", gap: 3 }}>
           <Typography
             variant="h6"
             noWrap
@@ -168,59 +125,80 @@ export default function Navbar() {
           >
             Shower
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <Autocomplete
-              sx={{ width: 300 }}
-              options={users || []}
-              autoHighlight
-              freeSolo
-              disableClearable
-              onChange={(_, value) => {
-                if (typeof value == "object" && "userName" in value)
-                  navigate(`/user/${value.userName.toLocaleLowerCase()}`);
-              }}
-              getOptionLabel={(option) =>
-                typeof option === "string"
-                  ? option
-                  : option.userName.toLocaleLowerCase()
-              }
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                  {...props}
-                >
-                  {isLoading ? (
-                    <Typography variant="body2">Searching users...</Typography>
-                  ) : (
-                    <Link to={`/user/${option.userName.toLocaleLowerCase()}`}>
-                      {option.userName.toLocaleLowerCase()}
-                    </Link>
-                  )}
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  placeholder="Search for user…"
-                  onChange={(e) => handleSearch(e.target.value)}
-                  inputProps={{
-                    ...params.inputProps,
-                    style: {
-                      fontSize: "small",
-                      border: "none",
-                      paddingLeft: 40,
-                    },
-                    type: "search", // disable autocomplete and autofill
-                  }}
-                />
-              )}
-            />
-          </Search>
+
+          <Autocomplete
+            sx={{
+              width: 300,
+            }}
+            options={users || []}
+            autoHighlight
+            freeSolo
+            disableClearable
+            onChange={(_, value) => {
+              if (typeof value == "object" && "userName" in value)
+                navigate(`/user/${value.userName.toLocaleLowerCase()}`);
+            }}
+            getOptionLabel={(option) =>
+              typeof option === "string"
+                ? option
+                : option.userName.toLocaleLowerCase()
+            }
+            renderOption={(props, option) => (
+              <Box
+                component="li"
+                sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                {...props}
+              >
+                {isLoading ? (
+                  <Typography variant="body2">Searching users...</Typography>
+                ) : (
+                  <Link
+                    to={`/user/${option.userName.toLocaleLowerCase()}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      textDecoration: "none",
+                    }}
+                  >
+                    {option.photoURL && (
+                      <img
+                        src={option.photoURL}
+                        alt={option.userName}
+                        width={30}
+                        style={{ borderRadius: 99 }}
+                      />
+                    )}
+                    {option.displayName}{" "}
+                    <Typography
+                      variant="body2"
+                      color={theme.palette.text.secondary}
+                    >
+                      @{option.userName.toLocaleLowerCase()}
+                    </Typography>
+                  </Link>
+                )}
+              </Box>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                placeholder="Search for user…"
+                onChange={(e) => handleSearch(e.target.value)}
+                inputProps={{
+                  ...params.inputProps,
+                  style: {
+                    fontSize: "small",
+                    border: "none",
+                    // paddingLeft: 40,
+                  },
+                  type: "search", // disable autocomplete and autofill
+                }}
+              />
+            )}
+          />
+
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton

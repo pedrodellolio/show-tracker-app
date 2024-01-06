@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { CreateShowFormData } from "../schemas/showFormSchema";
+import { UserShow } from "../models/UserShow";
 import { Show } from "../models/Show";
 
 const showCollectionRef = collection(db, "userShow");
@@ -27,22 +28,25 @@ async function getUserShowsSnapshot(
 }
 
 export async function addUserShow({
-  data,
   uid,
+  data,
+  tmdbShow,
 }: {
-  data: CreateShowFormData;
   uid: string;
+  data: CreateShowFormData;
+  tmdbShow: Show | null;
 }) {
   await addDoc(showCollectionRef, {
     userUID: uid,
-    name: data.name,
+    title: tmdbShow?.title,
     currentEpisode: data.currentEpisode,
     currentSeason: data.currentSeason,
     status: data.status,
     type: data.type,
-    score: data.score,
-    startYear: data.startYear,
-    endYear: data.endYear,
+    rating: data.rating,
+    releaseDate: tmdbShow ? new Date(tmdbShow.release_date) : null,
+    // startYear: data.startYear,
+    // endYear: data.endYear,
   });
 }
 
@@ -53,11 +57,11 @@ export async function deleteUserShow(showId: string) {
 
 export async function getUserShowsByUID(userUID: string) {
   const querySnapshot = await getUserShowsSnapshot("userUID", "==", userUID);
-  let docs: Show[] = [];
+  let docs: UserShow[] = [];
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
-    docs.push({ ...data, id } as Show);
+    docs.push({ ...data, id } as UserShow);
   });
   return docs;
 }

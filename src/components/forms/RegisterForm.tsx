@@ -56,11 +56,14 @@ function RegisterForm() {
         data.email,
         data.password
       );
-      await updateProfile(userCredentials.user, { displayName: data.userName });
+      // await updateProfile(userCredentials.user, {
+      //   displayName: data.firstName + " " + data.lastName,
+      // });
       await mutateAsync({
         userUID: userCredentials.user.uid,
-        photoURL: userCredentials.user.photoURL,
         userName: "",
+        displayName: userCredentials.user.displayName,
+        photoURL: userCredentials.user.photoURL,
       });
     } catch (err) {
       console.error(err);

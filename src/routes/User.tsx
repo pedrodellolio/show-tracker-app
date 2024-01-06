@@ -41,6 +41,7 @@ function User() {
         </Typography>
       </Box>
       <MoviesDataGrid
+        removable={false}
         data={data ?? []}
         loading={isLoading}
         userUID={details.userUID}

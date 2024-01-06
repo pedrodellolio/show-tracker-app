@@ -25,27 +25,32 @@ async function getUserDetailsSnapshot(
 }
 
 export async function addUserDetails({
-  photoURL,
-  userName,
   userUID,
+  userName,
+  displayName,
+  photoURL,
 }: UserDetails) {
   await addDoc(userDetailsCollectionRef, {
     userUID,
     userName: userName.toLocaleUpperCase(),
+    displayName,
     photoURL,
   });
 }
 
 export async function updateUserDetails({
-  photoURL,
-  userName,
   userUID,
+  userName,
+  photoURL,
 }: UserDetails) {
   const userDetailsUpdate: { [key: string]: any } = {};
   if (userName.trim() !== "")
     userDetailsUpdate.userName = userName.trim().toUpperCase();
 
   if (photoURL?.trim() !== "") userDetailsUpdate.photoURL = photoURL?.trim();
+
+  // if (displayName?.trim() !== "")
+  //   userDetailsUpdate.displayName = displayName?.trim();
 
   const querySnapshot = await getUserDetailsSnapshot("userUID", "==", userUID);
   querySnapshot.forEach((doc) => {
@@ -65,7 +70,12 @@ export async function getAllUsersDetailsByInput(value: string) {
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
-    docs.push({ userName: data.userName, userUID: id } as UserDetails);
+    docs.push({
+      userUID: id,
+      userName: data.userName,
+      displayName: data.displayName,
+      photoURL: data.photoURL,
+    } as UserDetails);
   });
   return docs;
 }
@@ -76,9 +86,10 @@ export async function getUserDetailsByUID(userUID: string) {
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     docs.push({
-      userName: data.userName,
-      photoURL: data.photoURL,
       userUID: data.userUID,
+      userName: data.userName,
+      displayName: data.displayName,
+      photoURL: data.photoURL,
     } as UserDetails);
   });
   return docs[0];
@@ -94,9 +105,10 @@ export async function getUserDetailsByUserName(userName: string) {
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     docs.push({
-      userName: data.userName,
-      photoURL: data.photoURL,
       userUID: data.userUID,
+      userName: data.userName,
+      displayName: data.displayName,
+      photoURL: data.photoURL,
     } as UserDetails);
   });
   return docs[0];

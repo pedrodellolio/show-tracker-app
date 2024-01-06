@@ -1,15 +1,16 @@
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Chip, Typography } from "@mui/material";
+import { DataGrid, GridColDef, gridClasses } from "@mui/x-data-grid";
+import { Box, Chip, Rating, Typography } from "@mui/material";
 import getShowStatusColor from "../utils/showStatusColor";
-import formatShowsGrid from "../utils/formatShowsGrid";
+import { formatShowsGrid } from "../utils/formatShowsGrid";
 import RowOptions from "../components/RowOptions";
 import useColorMode from "../hooks/useColorMode";
-import { Show } from "../models/Show";
+import { UserShow } from "../models/UserShow";
 
 interface Props {
   userUID: string;
-  data: Show[];
+  data: UserShow[];
   loading: boolean;
+  removable: boolean;
 }
 
 function MoviesDataGrid(props: Props) {
@@ -18,9 +19,9 @@ function MoviesDataGrid(props: Props) {
   const columns: GridColDef[] = [
     {
       field: "col1",
-      headerName: "Name",
+      headerName: "Title",
       disableColumnMenu: true,
-      width: 250
+      width: 250,
     },
     {
       field: "col2",
@@ -38,7 +39,7 @@ function MoviesDataGrid(props: Props) {
       field: "col4",
       headerName: "Status",
       disableColumnMenu: true,
-      // width: 150,
+      width: 150,
       renderCell: (params) => {
         const { bgColor, color } = getShowStatusColor(
           params.value as string,
@@ -56,35 +57,28 @@ function MoviesDataGrid(props: Props) {
       field: "col5",
       headerName: "Type",
       disableColumnMenu: true,
-      //  width: 150
     },
     {
       field: "col6",
-      headerName: "Score",
+      headerName: "Rating",
       disableColumnMenu: true,
-      // width: 150
+      width: 160,
+      renderCell: (params) => {
+        return <Rating readOnly value={params.value} size="small" />;
+      },
     },
-    // {
-    //   field: "col7",
-    //   headerName: "Start Year",
-    //   disableColumnMenu: true,
-    //   width: 150,
-    // },
-    // {
-    //   field: "col8",
-    //   headerName: "End Year",
-    //   disableColumnMenu: true,
-    //   width: 150,
-    // },
     {
       field: "options",
       headerName: "",
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      // width: 150,
       renderCell: (params) => {
-        return <RowOptions userUID={props.userUID} rowId={params.row.id} />;
+        return (
+          props.removable && (
+            <RowOptions userUID={props.userUID} rowId={params.row.id} />
+          )
+        );
       },
     },
   ];
@@ -96,6 +90,16 @@ function MoviesDataGrid(props: Props) {
           rows={props.data ? formatShowsGrid(props.data) : []}
           columns={columns}
           autoHeight
+          sx={{
+            [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
+              {
+                outline: "none",
+              },
+            [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]:
+              {
+                outline: "none",
+              },
+          }}
           slots={{
             noRowsOverlay: () => (
               <Box
