@@ -12,6 +12,7 @@ import { getDesignTokens } from "./theme";
 import { AuthProvider } from "./contexts/AuthContext";
 import { router } from "./main";
 import ColorModeContext from "./contexts/ColorModeContext";
+import "./global.css";
 
 function App() {
   const queryClient = new QueryClient();

@@ -6,6 +6,7 @@ import {
   addUserDetails,
   getUserDetailsByUID,
 } from "../services/userDetailsApi.ts";
+import { Backdrop, CircularProgress, useTheme } from "@mui/material";
 
 interface AuthContextData {
   user: User | null;
@@ -18,6 +19,7 @@ interface Props {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: Props) => {
+  const { palette } = useTheme();
   const queryClient = useQueryClient();
 
   const [user, setUser] = useState<User | null>(null);
@@ -64,7 +66,17 @@ export const AuthProvider = ({ children }: Props) => {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <Backdrop
+        sx={{
+          backgroundColor: palette.background.default,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={true}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
   }
 
   return (

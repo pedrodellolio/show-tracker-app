@@ -41,7 +41,7 @@ function UserDetailsForm(props: Props) {
   });
 
   async function updateDetails(data: CreateUserDetailsFormData) {
-    mutateAsync({ userUID: user!.uid, userName: data.userName, photoURL: "" });
+    mutateAsync({ userUID: user!.uid, userName: data.userName, photoURL: "", displayName: "" });
   }
 
   return (

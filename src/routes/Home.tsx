@@ -1,13 +1,35 @@
-import { Box, Button, Container, Drawer, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Drawer,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  Typography,
+} from "@mui/material";
 import MoviesDataGrid from "../components/MoviesDataGrid";
 import ShowForm from "../components/forms/ShowForm";
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getUserShowsByUID } from "../services/userShowsApi";
+import { Type } from "../models/UserShow";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 function Home() {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [typeFilter, setTypeFilter] = useState("");
   const { user } = useAuth();
 
   const { data, isLoading } = useQuery({
@@ -30,7 +52,32 @@ function Home() {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "end" }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+        >
+          <Select
+            displayEmpty
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            input={<OutlinedInput />}
+            renderValue={(selected) => {
+              if (selected.length === 0) {
+                return <em>Select</em>;
+              }
+
+              return selected;
+            }}
+            MenuProps={MenuProps}
+            inputProps={{ "aria-label": "Without label" }}
+          >
+            {Object.values(Type).map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
         <Button onClick={toggleDrawer(true)} variant="contained" sx={{ mb: 2 }}>
           Add Show
         </Button>
